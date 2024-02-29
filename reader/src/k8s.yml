@@ -1,0 +1,125 @@
+---
+apiVersion: "v1"
+kind: "ConfigMap"
+metadata:
+  name: "db-reader-config-p0uw"
+  namespace: "default"
+  labels:
+    app: "db-reader"
+data:
+  src_db_user: "postgres"
+  trg_db_user: "postgres"
+  src_db_password: "l0calADMIN"
+  trg_db_password: "l0calADMIN"
+  src_db_name: "dvdrental"
+  trg_db_name: "dvdrental"
+  src_db_host: "10.105.65.3"
+  trg_db_host: "10.105.65.3"
+  is_gcp: "true"
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "db-reader"
+  namespace: "default"
+  labels:
+    app: "db-reader"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: "db-reader"
+  template:
+    metadata:
+      labels:
+        app: "db-reader"
+    spec:
+      containers:
+      - name: "db-reader-sha256-1"
+        image: "us-central1-docker.pkg.dev/simplify-poc-415102/pilot/db-reader:latest"
+        imagePullPolicy: Always
+        env:
+        - name: "src_db_user"
+          valueFrom:
+            configMapKeyRef:
+              key: "src_db_user"
+              name: "db-reader-config-p0uw"
+        - name: "trg_db_user"
+          valueFrom:
+            configMapKeyRef:
+              key: "trg_db_user"
+              name: "db-reader-config-p0uw"
+        - name: "src_db_password"
+          valueFrom:
+            configMapKeyRef:
+              key: "src_db_password"
+              name: "db-reader-config-p0uw"
+        - name: "trg_db_password"
+          valueFrom:
+            configMapKeyRef:
+              key: "trg_db_password"
+              name: "db-reader-config-p0uw"
+        - name: "src_db_name"
+          valueFrom:
+            configMapKeyRef:
+              key: "src_db_name"
+              name: "db-reader-config-p0uw"
+        - name: "trg_db_name"
+          valueFrom:
+            configMapKeyRef:
+              key: "trg_db_name"
+              name: "db-reader-config-p0uw"
+        - name: "src_db_host"
+          valueFrom:
+            configMapKeyRef:
+              key: "src_db_host"
+              name: "db-reader-config-p0uw"
+        - name: "trg_db_host"
+          valueFrom:
+            configMapKeyRef:
+              key: "trg_db_host"
+              name: "db-reader-config-p0uw"
+        - name: "is_gcp"
+          valueFrom:
+            configMapKeyRef:
+              key: "is_gcp"
+              name: "db-reader-config-p0uw"
+---
+apiVersion: "autoscaling/v2"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "db-reader-hpa-imvl"
+  namespace: "default"
+  labels:
+    app: "db-reader"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "db-reader"
+    apiVersion: "apps/v1"
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: "Resource"
+    resource:
+      name: "cpu"
+      target:
+        type: "Utilization"
+        averageUtilization: 80
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "db-reader-service"
+  namespace: "default"
+  labels:
+    app: "db-reader"
+spec:
+  ports:
+  - protocol: "TCP"
+    port: 80
+    targetPort: 8080
+  selector:
+    app: "db-reader"
+  type: "LoadBalancer"
+  loadBalancerIP: ""
