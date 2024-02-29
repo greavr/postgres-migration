@@ -76,14 +76,14 @@ def hello_world():
     # Connect to the Source DB
     srcConn = BuildConnection(DBInfo=src_db_creds)
     srcData = FetchAllData(conn=srcConn)
-    logging.debug("Source Data:")
-    logging.debug(srcData)
+    logging.info("Source Data:")
+    logging.info(srcData)
     
     # Connect to the Target DB
     trgConn = BuildConnection(DBInfo=trg_db_creds)
     trgData = FetchAllData(conn=trgConn)
-    logging.debug("Target Data:")
-    logging.debug(trgData)
+    logging.info("Target Data:")
+    logging.info(trgData)
 
     # Render Page
     return render_template('index.html', src_db="CloudSQL", trg_db="AlloyDB", src_data=srcData, trg_data=trgData, src_len=len(srcData), trg_len=len(trgData))
@@ -102,7 +102,7 @@ if __name__ == "__main__":
         raw_secret = GetSecrets(secret_id=os.getenv('src_secret_id'))
         src_db_creds = dict(map(lambda x: x.split(':'), raw_secret.split(',')))
         logging.info("Pulled Source DB connection values from Secret Manager")
-    elif os.getenv('db_user') is not None:
+    elif os.getenv('src_db_user') is not None:
         # Check for values in Env
         src_db_creds["src_db_user"] = os.getenv('src_db_user')
         src_db_creds['src_db_password'] = os.getenv('src_db_password')
@@ -114,7 +114,7 @@ if __name__ == "__main__":
         logging.error("Unable to find Source DB Connection Values")
         exit(1)
 
-    logging.debug(src_db_creds)
+    logging.info(src_db_creds)
 
     # Find Source DB Creds
     if os.getenv('trg_secret_id') is not None:
@@ -136,4 +136,4 @@ if __name__ == "__main__":
 
 
     # Start App
-    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+    app.run(info=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
