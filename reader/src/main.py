@@ -117,6 +117,7 @@ if __name__ == "__main__":
 
     logging.info(src_db_creds)
 
+
     # Find Source DB Creds
     if os.getenv('trg_secret_id') is not None:
         # Check for Secret Hosting
@@ -134,7 +135,7 @@ if __name__ == "__main__":
         # Fail Hard
         logging.error("Unable to find Target DB Connection Values")
         exit(1)
-
+    logging.info(trg_db_creds)
 
     # Start App
     app.run(info=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
