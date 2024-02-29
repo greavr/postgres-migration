@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Cloud - Database Reader</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
+    <script src="{{url_for('static', filename='javascript.js')}}"></script>
+</head>
+<body>
+    <div  style="width: 100%;">
+        <div style="width: 50%; height: 100%; float: left; background: rgb(206, 234, 214);">
+            <h1>Source Database: <span style="color:blue">{{ src_db }}</span></h1>
+            Result Size: {{ src_len }} tables
+            <ol>
+            {% for key, value in src_data.items() %}
+                <li>{{ key }} - {{ value|length }} rows</li>
+            {% endfor %}
+            </ol>
+        </div>
+        <div style="margin-left: 50%; height: 100%; background:rgb(210, 227, 252);">
+            <h1>Target Database: <span style="color:blue">{{ trg_db }}</span></h1>
+            Result Size: {{ trg_len }} tables
+            <ol>
+            {% for key, value in trg_data.items() %}
+                <li>{{ key }} - {{ value|length }} rows</li>
+            {% endfor %}
+            </ol>
+        </div>
+    </div>
+</body>
+</html>
