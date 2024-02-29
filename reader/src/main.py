@@ -29,9 +29,9 @@ def ConfigureCloudLogging():
         client.setup_logging()
         logging.info("Using Cloud Loggging")
 
-def BuildConnection(DBInfo: dict):
+def BuildConnection(DBInfo: dict, friendly_name: str):
     """ This function builds and returns a PostGres Connection"""
-    logging.info(f"Building connection with the infO: {DBInfo}")
+    logging.info(f"Building {friendly_name} connection with the info: {DBInfo}")
     conn = None
     try:
         conn = psycopg2.connect(database=DBInfo["db_name"],
@@ -73,22 +73,31 @@ def FetchAllData(conn):
 
 @app.route("/")
 def hello_world():
-    """ Return Results"""
+    """ Spit out a webpage please"""
+
     # Connect to the Source DB
-    logging.info("Source Data:")
-    srcConn = BuildConnection(DBInfo=src_db_creds)
-    srcData, trgData = "",""
+    logging.info("Gathering Source Data")
+    srcConn = BuildConnection(DBInfo=src_db_creds,friendly_name="Source")
     srcData = FetchAllData(conn=srcConn)
-    logging.debug(srcData)
-    
+    logging.info("Source Data Gather Complete")
+
     # Connect to the Target DB
-    logging.info("Target Data:")
-    trgConn = BuildConnection(DBInfo=trg_db_creds)
+    logging.info("Gathering Target Data")
+    trgConn = BuildConnection(DBInfo=trg_db_creds,friendly_name="Target")
     trgData = FetchAllData(conn=trgConn)
+    logging.info("Target Data Gather Complete")
     logging.info(trgData)
 
-    src_len=len(srcData)
-    trg_len=len(trgData)
+
+    if srcData is not None:
+        src_len=len(srcData)
+    else:
+        src_len = 0
+    if trgData is not None:
+        trg_len=len(trgData)
+    else:
+        trg_len = 0
+
     logging.info(f"Src Len: {src_len}, Trg Len: {trg_len}")
 
     # Render Page
