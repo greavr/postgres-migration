@@ -78,13 +78,14 @@ def hello_world():
     logging.info("Source Data:")
     srcConn = BuildConnection(DBInfo=src_db_creds)
     srcData = FetchAllData(conn=srcConn)
-    logging.info(srcData)
+    logging.debug(srcData)
     
     # Connect to the Target DB
     logging.info("Target Data:")
     trgConn = BuildConnection(DBInfo=trg_db_creds)
     trgData = FetchAllData(conn=trgConn)
     logging.info(trgData)
+    
     src_len=len(srcData)
     trg_len=len(trgData)
     logging.info(f"Src Len: {src_len}, Trg Len: {trg_len}")
