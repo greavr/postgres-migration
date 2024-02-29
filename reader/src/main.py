@@ -85,9 +85,12 @@ def hello_world():
     trgConn = BuildConnection(DBInfo=trg_db_creds)
     trgData = FetchAllData(conn=trgConn)
     logging.info(trgData)
+    src_len=len(srcData)
+    trg_len=len(trgData)
+    logging.info(f"Src Len: {src_len}, Trg Len: {trg_len}")
 
     # Render Page
-    return render_template('index.html', src_db="CloudSQL", trg_db="AlloyDB", src_data=srcData, trg_data=trgData, src_len=len(srcData), trg_len=len(trgData))
+    return render_template('index.html', src_db="CloudSQL", trg_db="AlloyDB", src_data=srcData, trg_data=trgData, src_len=src_len, trg_len=trg_len)
 
 if __name__ == "__main__":
     # First check if running in google cloud
