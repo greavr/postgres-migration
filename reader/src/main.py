@@ -31,6 +31,7 @@ def ConfigureCloudLogging():
 
 def BuildConnection(DBInfo: dict):
     """ This function builds and returns a PostGres Connection"""
+    logging.info(f"Building connection with the infO: {DBInfo}")
     conn = None
     try:
         conn = psycopg2.connect(database=DBInfo["db_name"],
@@ -74,15 +75,15 @@ def FetchAllData(conn):
 def hello_world():
     """ Return Results"""
     # Connect to the Source DB
+    logging.info("Source Data:")
     srcConn = BuildConnection(DBInfo=src_db_creds)
     srcData = FetchAllData(conn=srcConn)
-    logging.info("Source Data:")
     logging.info(srcData)
     
     # Connect to the Target DB
+    logging.info("Target Data:")
     trgConn = BuildConnection(DBInfo=trg_db_creds)
     trgData = FetchAllData(conn=trgConn)
-    logging.info("Target Data:")
     logging.info(trgData)
 
     # Render Page
