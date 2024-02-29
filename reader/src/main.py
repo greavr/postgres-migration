@@ -77,7 +77,7 @@ def hello_world():
     # Connect to the Source DB
     logging.info("Source Data:")
     srcConn = BuildConnection(DBInfo=src_db_creds)
-    srcData, trgData = ""
+    srcData, trgData = "",""
     srcData = FetchAllData(conn=srcConn)
     logging.debug(srcData)
     
