@@ -108,10 +108,10 @@ if __name__ == "__main__":
         logging.info("Pulled Source DB connection values from Secret Manager")
     elif os.getenv('src_db_user') is not None:
         # Check for values in Env
-        src_db_creds["src_db_user"] = os.getenv('src_db_user')
-        src_db_creds['src_db_password'] = os.getenv('src_db_password')
-        src_db_creds['src_db_name'] = os.getenv('src_db_name')
-        src_db_creds['src_db_host'] = os.getenv('src_db_host')
+        src_db_creds["db_user"] = os.getenv('src_db_user')
+        src_db_creds['db_password'] = os.getenv('src_db_password')
+        src_db_creds['db_name'] = os.getenv('src_db_name')
+        src_db_creds['db_host'] = os.getenv('src_db_host')
         logging.info("Pulled Source DB Connection values from Environment")
     else:
         # Fail Hard
@@ -129,10 +129,10 @@ if __name__ == "__main__":
         logging.info("Pulled Target DB connection values from Secret Manager")
     elif os.getenv('db_user') is not None:
         # Check for values in Env
-        trg_db_creds["trg_db_user"] = os.getenv('trg_db_user')
-        trg_db_creds['trg_db_password'] = os.getenv('trg_db_password')
-        trg_db_creds['trg_db_name'] = os.getenv('trg_db_name')
-        trg_db_creds['trg_db_host'] = os.getenv('trg_db_host')
+        trg_db_creds["db_user"] = os.getenv('trg_db_user')
+        trg_db_creds['db_password'] = os.getenv('trg_db_password')
+        trg_db_creds['db_name'] = os.getenv('trg_db_name')
+        trg_db_creds['db_host'] = os.getenv('trg_db_host')
         logging.info("Pulled Target DB Connection values from Environment")
     else:
         # Fail Hard
