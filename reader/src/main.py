@@ -129,7 +129,7 @@ if __name__ == "__main__":
         raw_secret = GetSecrets(secret_id=os.getenv('trg_secret_id'))
         trg_db_creds = dict(map(lambda x: x.split(':'), raw_secret.split(',')))
         logging.info("Pulled Target DB connection values from Secret Manager")
-    elif os.getenv('db_user') is not None:
+    elif os.getenv('trg_db_user') is not None:
         # Check for values in Env
         trg_db_creds["db_user"] = os.getenv('trg_db_user')
         trg_db_creds['db_password'] = os.getenv('trg_db_password')
