@@ -27,6 +27,7 @@ There are several additional components used to simplify application:
 - [Overview](#overview)
 - [Network Diagram](#network-diagram)
 - [Installation](#installation)
+  - [Manual Steps](#manual-install)
 - [Prerequisites](#prerequisites)
 - [Tool Setup Guide](#tool-setup-guide)
 
@@ -38,6 +39,45 @@ There are several additional components used to simplify application:
 ## Installation
 <a id="installation"></a>
 Terraform will be used to deploy the entire application, however there are still some manual steps (install the sample DB for example)
+
+### Manual Configuration:
+<a id="manual-install"></a>
+1. Create a new Project
+1. [Create a default VPC](https://cloud.google.com/vpc/docs/create-modify-vpc-networks) (with at least one region configured, recommended us-west1 or us-central1)
+1. [Next we provision a CloudSQL instance with private IP address](https://cloud.google.com/sql/docs/postgres/connect-instance-private-ip)
+    1. [This also includes information the Cloud SQL Proxy](https://cloud.google.com/sql/docs/postgres/connect-kubernetes-engine#proxy)
+    1. Copy the Postgres username, password, and private IP address for later
+    1. You will need to connect to the CloudSQL DB instance using the [Cloud SQL Proxy agent]((https://www.postgresqltutorial.com/postgresql-getting-started/postgresql-sample-database/)), and install the [PostgreSQL sample database](https://www.postgresqltutorial.com/postgresql-getting-started/postgresql-sample-database/))
+1. [Next we provision a AlloyDB Instance also with a private IP address (default)](https://cloud.google.com/alloydb/docs/cluster-create)
+    1. [This also includes information the AlloyDB Auth Proxy](https://cloud.google.com/alloydb/docs/auth-proxy/overview)
+    1. Copy the Postgres username, password, and private IP address for later
+1. [Next we configure secret manager with the username and passwords for each instance](https://cloud.google.com/secret-manager/docs/creating-and-accessing-secrets)
+    1. Name: **srcdb** -- Must be the name of the secret
+    1. Value: **db_user:{user},db_password:{password},db_name:{database_name},db_host:{private_ip}**
+    1. Name: **targetdb** -- Must be the name of the secret
+    1. Value: **db_user:{user},db_password:{password},db_name:{database_name},db_host:{private_ip}**
+1.Now we need to configure DMS. [We need to setup a workflow which will setup replication between the source](https://cloud.google.com/database-migration/docs/postgres/quickstart)
+    1. When configuring the source we will use the values from the CloudSQL instance using the private instance IP
+    1. When configuring the target we will use the values from the AlloyDB instance using the private instance IP
+  This will need a bit of time to test and setup replication. We can monitor replication status from the job page within [Cloud DMS Console](https://console.cloud.google.com/dms]
+1. [Provision a GKE Autopilot cluster](https://cloud.google.com/kubernetes-engine/docs/how-to/creating-an-autopilot-cluster) (this will by default enable workload identity)
+1. [Create and configure a new Service Account for use with Workload Identity](https://cloud.google.com/iam/docs/service-accounts-create)
+    1. Grant the following permissions:
+        1. ***roles/iam.workloadIdentityUser*** - Enable SA to be used with Workload Identity
+        1. ***roles/secretmanager.secretAccessor*** - Enable access to secrets
+        1. ***roles/logging.logWriter*** - Used to write application logs
+1. [Connect to the GKE Autopilot cluster with Kubectl(https://cloud.google.com/kubernetes-engine/docs/how-to/creating-an-autopilot-cluster#connecting_to_the_cluster)
+1. Deploy the Reader & [Writer Yaml](./database%20app/writer/deployment.yaml) [Deployment Yaml](./database%20app/reader/deployment.yaml) 
+
+
+### Validate Changes
+When the rollout of the yaml is complete you should need to find the ingress IP for the Reader deployment on GKE Autopilot. You can find this on the [Gateway, Services & Ingress](https://console.cloud.google.com/kubernetes/discovery) page within the GKE section. Refresh the page and you should see the staff record count change.
+
+You can also connect to either databases via the proxy remotely ((Cloud SQL)[(https://www.postgresqltutorial.com/postgresql-getting-started/postgresql-sample-database/)], [Alloy DB](https://cloud.google.com/alloydb/docs/auth-proxy/connect)) and after connecting to the dvd rental. You can use the following query to look for the changes:
+``` sql
+SELECT * FROM STAFF ORDER BY last_update Desc limit 5;
+```
+
 
 ## Prerequisites
 <a id="prerequisites"></a>
