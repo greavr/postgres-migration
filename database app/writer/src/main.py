@@ -37,7 +37,7 @@ def BuildConnection(DBInfo: dict):
                             connect_timeout=3)
         logging.info("Built DB Connection")
     except Exception as e:
-        logging.error(f"Unable to connect to the DB")
+        logging.error(f"Unable to connect to the DB")   
         logging.error(e)
 
     return conn
@@ -48,21 +48,62 @@ def ListTables(conn):
     cursor.execute("select relname from pg_class where relkind='r' and relname !~ '^(pg_|sql_)';")
     table_list = []
     for row in cursor.fetchall():
-        print(row[0])
         table_list.append(row[0])
+    logging.debug("table pull successful")
     return table_list
 
 def UpdateTable(conn, table_name: str):
     """ This function will randomly update a row in a table"""
-    print(f"Update: {table_name}")
+    try:
+        sql = """ UPDATE staff SET first_name = %s WHERE staff_id = %s"""
+        
+        with  conn.cursor() as cur:
+            # execute the UPDATE statement
+            random_name = choice(["rick","indy","jayton","josephine","Paulo","jinko","Steve","robeerto"])
+            
+
+            # commit the changes to the database
+            conn.commit()
+            logging.info("Update successful")
+    except Exception as e:
+        logging.error(f"Unable to Insert")
+        logging.error(e)
 
 def InsertIntoTable(conn, table_name: str):
-    """ This function will randomly insert a new row in a table"""
-    print(f"Insert: {table_name}")
+    """ This function will randomly insert a new row in a table """
+    try:
+        sql = """INSERT INTO staff(first_name, last_name, address_id, email, store_id, active, username, password)
+                VALUES(%s,%s,%s,%s,%s,%s,%s,%s);"""
+        
+        with  conn.cursor() as cur:
+                # execute the UPDATE statement
+                random_fname = choice(["rick","indy","jayton","josephine","Paulo","jinko","Steve","robeerto"])
+                random_sname = choice(["smith","jones","johnson","apples","sausages","chair"])
+                cur.execute(sql, (random_fname, random_sname, randint(1,3),"a@a.com",randint(1,3),True,[choice('abcde') for _ in range(4)],"pass"))
+
+                # commit the changes to the database
+                conn.commit()
+                logging.info("Insert successful")
+    except Exception as e:
+        logging.error(f"Unable to Insert")
+        logging.error(e)
 
 def DeleteFromTable(conn, table_name: str):
-    """ This function will randomly delete a row in a table"""
-    print(f"Delete: {table_name}")
+    """ This function will randomly delete a row in a table """
+    try:
+        sql = 'DELETE FROM staff WHERE staff_id = %s'
+        
+        with  conn.cursor() as cur:
+            this_id = randint(1,100)
+            # execute the UPDATE statement
+            cur.execute(sql, [this_id])
+
+            # commit the changes to the database
+            conn.commit()
+            logging.info("Delete successful")
+    except Exception as e:
+        logging.error(f"Unable to delete")
+        logging.error(e)
 
 
 if __name__ == "__main__":
@@ -112,7 +153,9 @@ if __name__ == "__main__":
 
         # Select List of Tables
         tableList = ListTables(conn=myConn)
-        thisTable = choice(tableList)
+        #thisTable = choice(tableList)
+        # Hard coding table for now
+        thisTable = "staff"
         logging.debug(tableList)
         
         # Pick a random task:
